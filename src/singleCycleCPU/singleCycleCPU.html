@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>singleCycleCPU</title>
+    <link rel="stylesheet" href="singleCycleCPU.css">
+</head>
+<body>
+    <h1>Single Cycle CPU</h1>
+    <h2>Overview</h2>
+    <p>
+        This is a passion project that I worked on during the summer of 2022. 
+        Before my summer break, I took a class on <b>digital logic</b> and wanted to see how much I can expand upon this knowledge.
+        It was meant to be part of a bigger project, which was to build a 16-bit computer in Minecraft.
+    </p>
+    <p>
+        I've build (in a simulation) a 8-bit, single-cycle computer.
+        <ul>
+            <li>32 deep, 1 byte wide memory. Implemented as 16 deep because of lag</li>
+            <li>2 registers, refered to as A/B register</li>
+            <li>10 ALU operations</li>
+            <li>Instruction & data memory are shared</li>
+            <li>ISA that allows memory-reg, ALU and control flow operations</li>
+        </ul>
+    </p>
+    <p>
+        I used <a href="https://play.google.com/store/apps/details?id=com.duracodefactory.logiccircuitsimulatorpro&hl=en&gl=US">Logic Circuit Simulator Pro</a> on my phone to design and test, during my trip in France. 
+        I admit that this enviroment was very difficult to work in. 
+        One obvious downside was that this app did not have multi-bit support... so I had to connect everything one by one.
+        Here is the image exported view of the project:
+        <br><br>
+        <img src="./res/overview_export.png" alt="Overview of the project inside of Logic Circuit Simulator Pro." width="100%">
+        <br><br>
+        As you can imagine, it was incredibly cumbersome to work on this on a mobile phone. 
+        A lot of the work was done connecting the components, rather than designing and testing.
+    </p>
+
+    <h2>Details</h2>
+    <p>
+        I'd imagine that above image was quite confusing.
+        So here is a high level diagram of the whole architecture.
+        <br><br>
+        <img src="./res/high_level_diagram.jpg" alt="High level diagram of the project." width="100%">
+        <br>
+        Key: 
+        <span style="color: purple">control signals</span>
+        <span style="color: red">clock signal</span>
+        <span style="color: pink">flag signal</span>
+    </p>
+
+    <h3>ISA</h3>
+    Each instruction was a byte long (8 bits) and 3 bits were used as the opcode.
+    There were total 2^3 = 8 instructions.
+    <ol>
+        <li>loadA addr</li>
+        <li>loadB addr</li>
+        <li>storeA addr</li>
+        <li>storeB addr</li>
+        <li>ALU dest op -- ALU always operated on the values of reg A and B</li>
+        <li>branch addr</li>
+        <li>condBranch addr</li>
+        <li>halt</li>
+    </ol> 
+    You might be wondering how <code>condBranch</code> works. 
+    The ALU component is a sequencial module in my design. 
+    It contains a flag register that updates depending on the results of some <code>compare</code> instruction.
+    
+</body>
+</html>

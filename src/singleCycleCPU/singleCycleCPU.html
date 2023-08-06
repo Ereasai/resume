@@ -12,14 +12,25 @@
     <p>
         This is a passion project that I worked on during the summer of 2022. 
         Before my summer break, I took a class on <b>digital logic</b> and wanted to see how much I can expand upon this knowledge.
-        It was meant to be part of a bigger project, which was to build a 16-bit computer in Minecraft.
+        Towards the end of the course, we learned about control subsystem and data subsystem. 
+        To explain briefly, the two systems worked together to achieve more complex behavior with less components.
+        I saw that only a simple extension of the control subsystem will make this into a programmable computer.
+    </p>
+    <p>
+        This is a very basic implementation of a CPU. 
+        Please note that I worked on this project with very limited knowledge on computer architecture!
+        Regardless, I enjoyed figuring out how to achieve the <i>desired behavior of a computer</i> with the limited knowedge I had. 
+        I believe I expanded my knowledge on computer architecture, ISA design, and debugging.
+    </p>
+    <p>
+        ps: It was meant to be part of a bigger project, which was to build a 16-bit computer in Minecraft.
     </p>
     <p>
         I've build (in a simulation) a 8-bit, single-cycle computer.
         <ul>
             <li>32 deep, 1 byte wide memory. Implemented as 16 deep because of lag</li>
             <li>2 registers, refered to as A/B register</li>
-            <li>10 ALU operations</li>
+            <li>11 ALU operations</li>
             <li>Instruction & data memory are shared</li>
             <li>ISA that allows memory-reg, ALU and control flow operations</li>
         </ul>
@@ -34,6 +45,7 @@
         <br><br>
         As you can imagine, it was incredibly cumbersome to work on this on a mobile phone. 
         A lot of the work was done connecting the components, rather than designing and testing.
+        Upon closer inspection of the image, I hope you can notice all the major components of a CPU, like the program counter, memory, registers, and the control unit.
     </p>
 
     <h2>Details</h2>
@@ -48,10 +60,31 @@
         <span style="color: red">clock signal</span>
         <span style="color: pink">flag signal</span>
     </p>
+    <p>
+        On the top left of the diagram, you can see the basic program counter implementation. 
+        The next value of the PC is either <code>[PC] + 1</code>, value from <code>branch</code> and <code>condBranch</code>, or <code>0</code>. This allows for basic control flow operations.
+    </p>
+    <p>
+        In the middle of the diagram, the RAM's <code>addr</code> input is either <code>[PC]</code> or instruction argument. 
+        Each respective value is let through when clock is low and high. 
+        So, on the falling edge of the clock, the memory is read at address <code>[PC]</code> (fetch), and on the rising edge, the memory is read from the argument of the instruction byte, when applicable (execute).
+        In retrospect, the choice of having shared memory was a bad idea, given that the memory module had a very small capacity.
+        I had to manage both instruction memory and program memory (stack variables), in the same 16 deep memory.
+    </p>
+    <p>
+        You can also imagine that programming on this was difficult and very limited.
+    </p>
+    <p>
+        On the right of the diagram, you can see the two A/B registers. 
+        The values of each register is fed into the ALU, i.e. the ISA wants to always operate on values of <code>A</code> and <code>B</code>. 
+        Also, note that the ALU has a <code>flag</code> output, which is set when using <code>compare</code> type ALU operations.
+    </p>
 
     <h3>ISA</h3>
-    Each instruction was a byte long (8 bits) and 3 bits were used as the opcode.
-    There were total 2^3 = 8 instructions.
+    <p>
+        Each instruction was a byte long (8 bits) and 3 bits were used as the opcode.
+        There were total 2^3 = 8 instruction types.
+    </p>
     <ol>
         <li>loadA addr</li>
         <li>loadB addr</li>
@@ -62,9 +95,25 @@
         <li>condBranch addr</li>
         <li>halt</li>
     </ol> 
-    You might be wondering how <code>condBranch</code> works. 
-    The ALU component is a sequencial module in my design. 
-    It contains a flag register that updates depending on the results of some <code>compare</code> instruction.
+    <p>
+        ALU operations (op) consists of:
+    </p>
+    <ol start="0">
+        <li>add</li>
+        <li>sub</li>
+        <li>cmp A > B</li>
+        <li>cmp A < B</li>
+        <li>cmp A == B</li>
+        <li>A <- B</li>
+        <li>B <- A</li>
+        <li>bitwise NOR</li>
+        <li>bitwise OR</li>
+        <li>bitwise AND</li>
+        <li>bitwise XOR</li>
+    </ol>
+    <p>
+        The <code>cmp</code> operation stores the result to the flag register of the ALU.
+    </p>
     
 </body>
 </html>

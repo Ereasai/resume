@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSE 167 Curves Extra Credit</title>
+    <style>
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+        }
+    </style>
+</head>
+
+<body style="margin-left: 25%; margin-right: 25%; margin-bottom: 100px;">
+    <span>
+        <h1>CSE 167 2023 Winter (Ramamoorthi)</h1>
+        <h1>HW 3 Curves, Extra Credit</h1>
+        <h2>Gunwoo Kim, gukim@ucsd.edu</h2>
+        <span style="color: rgb(52, 52, 222); 
+                     background-color: rgb(235, 235, 235); border-radius: 5px; 
+                     display: flex; gap: 20px; padding: 20px; width: fit-content;">
+            <span onclick="switchMain()"><u>Main</u></span> |
+            <span onclick="switchDoc()"><u>Documentation</u></span> |
+            <span onclick="switchChanges()"><u>Changes</u></span> 
+        </span>
+    </span>
+    
+    <span id="main-page" style="display: block;">
+        
+        <h3>Overview</h3>
+        <p>
+            This is a simple program for creating a <b>surface of revolution</b>, defined by the 4 curve options from the original assignment. The program is able to view only one shape at a time and define one curve at a time. It does not have capabilities to export the vertex/normal data. The focus for me on this extra credit portion was to create a <b>nicely rendered image</b> of the surface of revolution, rather than packing a lot of features. I did not look at other resources for finding normals or surface of revolution; the details have been resolved by myself.
+        </p>
+        <center>
+            <img src="./documentation/showcase.gif" width="100%" alt="">
+        </center>
+
+        <h3>Capabilities</h3>
+        <ul>
+            <li>
+                <b>Surface of Revolution</b>: The user can define a curve in the curve editing window. Upon updating the curve, the program will then generate an 3D model of the surface of revolution on the 3D Model window. The surface is revolved around the y-axis.
+            </li>
+            <li>
+                <b>Viewing</b>: The user can use their mouse to manipulate the camera of the 3D Model window. Supports zoom and rotation.
+            </li>
+            <li>
+                <b>Sharp Edge Detection</b>: The models may have sharp edges which should be displayed as a sharp edge, rather than interpolating the normals across it. The user has the option to set a threshold to display sharp edges as a sharp edge for a more realistic preview.
+            </li>
+        </ul>
+        <h3>Instructions + Controls</h3>
+        <ol>
+            <li>
+                Open the Visual Studios project located at <code>hw-curves/hw-curves.sln</code>.
+            </li>
+            <li>
+                Press F5, or click the run button on top. Two windows should pop up.
+            </li>
+            <li>
+                The window on the left is the <b>Curve Edit Window</b>. This is where you will define your curve. The axis of rotation is the <b>left edge</b> of your screen. The curve options are (press key while focused on the window):
+                <ul>
+                    <li>Lines: 0</li>
+                    <li>Bezier: 1</li>
+                    <li>B-spline: 2</li>
+                    <li>Recursive Bezier: 3</li>
+                    <li>levelOfDetail (increase/decrease detail): +/- </li>
+                </ul>
+                <b>Warning:</b> The curve <b>MUST BE</b> defined top to bottom, or the normals will be off!
+            </li>
+            <li>
+                The window on the right is the <b>3D Model Window</b>. 
+                This is where your surface of revolution will be previewed. 
+                Note that the first and the last point of the curve is extended to the y-axis, hence the flat top and bottom.
+                You can manipulate the view by dragging your mouse.
+                
+                Controls:
+                <ul>
+                    <li>Rotate: Left Click + Drag </li>
+                    <li>Zoom: Right Click + Drag Up/Down</li>
+                    <li>Reset View: R</li>
+                </ul>
+                <b>Warning:</b> There is a bug where upon updating the curve <code>levelOfDetail</code>, the polygon will not be updated until the next change in <code>levelOfDetail</code>. This issue is discussed in the documentation page.
+            </li>
+            <li>
+                To adjust shader and other various settings, go to top of <code>main.cpp</code> (around line 40). 
+                <ul>
+                    <li>
+                        <b><code>RESOLUTION</code></b>: Defines how many subdivisions of angles will be used to construct the model, e.g. if <code>RESOLUTION = 10</code>, then points on the curve will be rotated by increments of 36 degrees, 10 times.
+                    </li>
+                    <li>
+                        <b><code>ACCOUNT_FOR_SHARP_EDGE</code></b>: If set to <code>true</code>, sharp edges will be created if the cosine of the angle at the vertex is below <code>sharp_edge_thereshold</code>.
+                    </li>
+                    <li>
+                        <b><code>sharp_edge_thereshold</code></b>: Threshold angle to define when sharp edges should be created. Only relevant if <code>ACCOUNT_FOR_SHARP_EDGE</code> is enabled.
+                    </li>
+                    <li>
+                        <b><code>SHADER_IN</code></b>, <b><code>SHADER_IN_SHININESS</code></b>: Material properties and light setting. A point light is placed at the camera (kind of like pointing at the origin with a flashlight).
+                    </li>
+                </ul>
+            </li>
+        </ol>
+        <h3>Remarks</h3>
+        <p>
+            The program can be easily extended to support multiple curves and multiple surfaces at once. Due to other courses, it is hard to put in all of my energy into this assignment. It seems like resolving the polygon construction part of a modeling software is the hardest part.
+        </p>
+        <ul>
+            <li>In my vision, the program can have multiple VBO, EBO, NBO to store different polygons generated by different curves.</li>
+            <li>There will be two display options in the 3D Modeling window: one for seeing each surface defined by a curve, and one for composing all of the models into one scene. More control will be added to the 3D Modeling window to allow for transformation of the selected surface. One will be able to instantiate multiple instances of the same surface.</li>
+            <li>There will be a list of objects, 1) each corresponding to a surface generated by one of the curve, 2) a transformation stack corresponding to this instance of the surface, and 3) material properties for the shader.
+            </li>
+        </ul>
+        <p>
+            This was a very fun and challenging assignment.
+        </p>
+        
+    </span>
+
+    <span id="documentation-page" style="display: none">
+        <h3>Documentation</h3>
+        This page will document the process and challenges I faced.
+        <h1 id="section">2/23</h1>
+        <ul>
+            <li>Added second window.</li>
+            <li>Successful redisplay of the Curve Editor window in a separate
+                buffer.</li>
+        </ul>
+        <h1 id="section-1">2/24</h1>
+        <ul>
+            <li><code>Curve::draw()</code> now takes
+                <code>Pvector &amp; discreteCurvePoints</code>, which can be updated
+                with discrete points evaluated by each of the respective
+                <code>Curve::draw()</code> functions.
+            </li>
+            <li>This vector is used to construct the solid in the 3D display
+                window.</li>
+        </ul>
+        <h1 id="section-2">2/25</h1>
+        <ul>
+            <li>Phong shader added, only supports one light source coming out of the
+                eye.</li>
+            <li>NBO, EBO, VBO added (there is a ‘3D’ suffix in the code).</li>
+            <li>Callbacks are intercepted to update the 3D shape. For instance,
+                changing <code>levelOfDetail</code> reloads the shape.</li>
+            <li>Surface of revolution complete! However, a lot of vertices are
+                redundant. Furthermore, the normals are not interpolated correctly (more
+                info on the algorithm after the following bullet points).
+                <ul>
+                    <li>rewrite <code>reloadShape()</code> to use vertices that have been
+                        already added.</li>
+                    <li>only run <code>reloadShape()</code> when it is really required.
+                        Specifically, when the user is done editing the curve.</li>
+                </ul>
+            </li>
+        </ul>
+        <h2 id="initial-naive-revolution-algorithm">Initial (Naive) Revolution
+            Algorithm</h2>
+        A quick naive approach to generate the solid. Take
+        <code>discreteCurvePoints</code> updated by each of the curve algorithm,
+        and simply rotate around the y-axis. I saw the opportunity to reuse a
+        lot of data, that is, to only put a <strong>vertical strip</strong> of
+        the object into the buffer and simply draw the full object using
+        <code>Transform::rotate()</code>.
+        <center>
+            <img src="./documentation/initial_revolution_algorithm/diagram.png" alt="curve and shape generated from the inital algorithm" width="600" />
+        </center>
+        For my particular implementation, I only iterate once to get the vertical strip into the shader, then it is drawn multiple times with a different <code>modelview</code> matrix.
+        Here is the result:
+        <center>
+            <img src="./documentation/initial_revolution_algorithm/curve-shape-init.png" alt="curve and shape generated from the inital algorithm" width="500" />
+        </center>
+        <h3 id="problems-with-the-naive-approach">Problems with the Naive
+            Approach</h3>
+        <p>Clearly, the object rendered on the screen doesn’t look smooth at
+            all. It may make sense for it to look sharp on the horizontal edges, but
+            vertical edges should be smooth as it was “revolved”.</p>
+        <p>The fix to this problem was quite straightfoward; the algorithm had
+            to use shared vertices. This, I believe, meant that I could not simply
+            save a <strong>vertical strip</strong> of the shape and reuse it to draw
+            the full solid. Hence, the next algorithm will account for the faults of
+            this algorithm.</p>
+        <h1 id="section-3">2/26</h1>
+        <ul>
+            <li>the 3D shape will only update when the curve is modified + mouse is
+                release.
+                <ul>
+                    <li>had to change <code>glutMouseFunc()</code> callback function for the
+                        curves window to run both <code>scene.mouse()</code> and
+                        <code>reloadShape()</code> function, which will set the buffers for the
+                        new updated shape.
+                    </li>
+                    <li>increased performance!!!</li>
+                </ul>
+            </li>
+            <li>Imporved the revolution algorithm.</li>
+        </ul>
+        <h2 id="the-new-revolution-algorithm">The New Revolution Algorithm</h2>
+        Instead of creating separate vertices for each of the edges of the
+        triangle, share the vertices. Hence, the rotated discrete points are
+        only added once to the buffer. All of the vertices of the whole object
+        is added to the buffer. The result is a much more smooth render of the
+        object. Here are some images:
+        <center>
+            <img src="./documentation/new_algorithm/curve1.png" alt="new algorithm example 1 curve" width="300" />
+            <img src="./documentation/new_algorithm/shape1.png" alt="new algorithm example 1 shape" width="300" />
+        </center>
+        <p>Even with reletively small <code>levelOfDetail</code> on the curve,
+            the object generated appears smooth (the normals are being
+            interpolated).</p>
+        <center>
+            <img src="./documentation/new_algorithm/curve2.png" alt="new algorithm example 2 curve" width="300" />
+            <img src="./documentation/new_algorithm/shape2.png" alt="new algorithm example 2 shape" width="300" />
+        </center>
+        <p>Same curve with high <code>levelOfDetail</code>.</p>
+        <center>
+            <img src="./documentation/new_algorithm/curve3.png" alt="new algorithm example 2 curve" width="300" />
+            <img src="./documentation/new_algorithm/shape3.png" alt="new algorithm example 2 shape" width="300" />
+            <img src="./documentation/new_algorithm/shape3.1.png" alt="new algorithm example 2 shape" width="300" />
+        </center>
+        <p>Some more complex objects.</p>
+        <h3 id="observations">Observations</h3>
+        <p>There are some problems with the normals. On sharp edges, the normals
+            should not be interpolated. When the normals are interpolated between
+            two faces that are connected by a sharp edge, it creates a very weird
+            image. This issue is discussed more in the next section.</p>
+        <h1 id="section-4">2/27</h1>
+        <ul>
+            <li>TODO:
+                <ul>
+                    <li>clean up debug messages</li>
+                    <li>make website</li>
+                    <li>fix normal issue</li>
+                </ul>
+            </li>
+            <li>normal calculation is more accurate, sample two adjacent points
+                (left-foward, right-foward, left-back, right-back), instead of just
+                right.</li>
+        </ul>
+        <h2 id="forced-sharp-edges-mode-0">Forced Sharp Edges (Mode 0)</h2>
+        <ul>
+            <li>Some models might require shape edges, like when option 0 (lines)
+                are used to create the curve. <em>Here is an example:</em>
+                <center>
+                    <img src="./documentation/forced_sharp_edges/curve.png" alt="curve" width="300" />
+                    <img src="./documentation/forced_sharp_edges/shape.png" alt="shape" width="300" />
+                </center>
+            </li>
+            <li>You can see that the bottom and top part of the figure does not
+                display the visually “correct” normals.</li>
+        </ul>
+        <center>
+            <img src="./documentation/forced_sharp_edges/curve-fix.png" alt="curve" width="300" />
+            <img src="./documentation/forced_sharp_edges/shape-fix.png" alt="shape" width="300" />
+        </center>
+        <ul>
+            <li>In line curve mode (option 0), each vertex is created three times to
+                allow sharp normals (this obviously isn’t the best solution, but added
+                as a quick solution. In a real implementation, it should only create two
+                of the same vertices so that the normals are not interpolated between
+                the previous and next vertices that are connect to it).</li>
+        </ul>
+        <h2 id="accounting-for-sharp-edges-other-curve-options">Accounting For
+            Sharp Edges (other curve options)</h2>
+        <ul>
+            <li>Using Bezier curve (option 1), we can see that sharp edges are
+                interpolated and creates an unpleasant image.
+                <center>
+                    <img src="./documentation/sharp_edge_correction/curve.png" alt="curve" width="300" />
+                    <img src="./documentation/sharp_edge_correction/shape1.png" alt="shape" width="300" />
+                    <img src="./documentation/sharp_edge_correction/shape2.png" alt="shape" width="300" />
+                </center>
+            </li>
+            <li>The second view of image shows that the top of the object is
+                actually flat. But looking at it from certain angles, it does not look
+                flat. This is caused by normals being interpolated between the vertex on
+                the top of the object and on the edge (Same applies to the lower part of
+                the object).</li>
+            <li>Added an option to account for sharp edges and create extra vertices
+                if nesessary.
+                <center>
+                    <img src="./documentation/sharp_edge_correction/curve-fix.png" alt="curve" width="300" />
+                    <img src="./documentation/sharp_edge_correction/shape-fix.png" alt="shape" width="300" />
+                </center>
+            </li>
+            <li>Simple solution was, adding extra edges to the same vertex if the
+                angle on that vertex is too harsh. This threshold can be adjusted
+                (within the source code) to the user’s liking.</li>
+        </ul>
+        <h1 id="section-5">2/28</h1>
+        <ul>
+            <li>Finish documentation and make website.
+                <ul>
+                    <li>Local HTML file.</li>
+                    <li>Instruction on how to use and change settings.</li>
+                    <li>Put this markdown file into the HTML document.</li>
+                </ul>
+            </li>
+            <li>Clean up code.</li>
+        </ul>
+        <h1 id="issues">Issues</h1>
+        <ul>
+            <li>Changing <code>levelOfDetail</code> does not immediately update the
+                object. Specifically it updates on the next <code>display3D()</code>
+                callback.
+                <ul>
+                    <li>Cause: the <code>discreteCurvePoints</code> is only updated when
+                        <code>Curve::draw()</code> is called. <code>glPostRedisplay()</code> is
+                        called on the curve window and then the polygon is immediately recreated
+                        and added to the buffer. Notice that the <code>reloadShape()</code> is
+                        still using the old <code>discreteCurvePoints</code>. Then, GLUT runs
+                        all the display callbacks, in which <code>discreteCurvePoints</code> is
+                        actually updated with the new points.
+                    </li>
+                    <li>Fixes:
+                        <ul>
+                            <li>generate points not in the display callbacks, rather within the main
+                                program.</li>
+                            <li>run <code>reloadShape()</code> again after <code>display()</code>
+                                callback is called (quicker solution, but messy).</li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </span>
+
+    <span id="changes-page" style="display: none"> 
+
+        <!--For readability-->
+        <style>
+            #changes-page code {
+                background-color: rgb(175, 221, 221);
+                border-radius: 5px;
+            }
+            details {
+                background: rgb(219, 219, 219);
+                padding: 10px;
+            }
+        </style>
+
+        <h3>Changes</h3>
+        This page will document the parts that has been modified and added to the original files.
+
+        <br>
+
+        <!--Main.cpp-->
+        <details>
+            <summary>main.cpp</summary>
+
+
+            <h4>Modifications</h4>
+
+            <h4><code>int main()</code></h4>
+            <ul>
+                <li>Second window creation.</li>
+                <li>Buffer cleanup.</li>
+                <li>Callbacks.</li>
+                <ul>
+                    <li>Some of curve window callbacks have been linked to a different function, which will run the original callback, but also execute other routines, like updating the shape. The new callbacks that has been added are discussed below.</li>
+                </ul>
+            </ul>
+
+
+            <h4>Additions</h4>
+
+            <h4><code>void keyboard(unsigned char key, int x, int y)</code></h4>
+            An intermediate keyboard callback function for the Curve Edit Window.
+            <ul>
+                <li>Original keyboard callback is calld.</li>
+                <li>Extra behavior needed when <code>levelOfDetail</code> is updated. Updates the shape when <code>levelOfDetail</code> changes.</li>
+                <li>For curve option 0 (straight lines), the <code>reloadShape</code> function is informed to treat all edges like a sharp edge.</li>
+            </ul>
+
+            <h4><code>void mouse(int button, int state, int x, int y)</code></h4>
+            An intermediate mouse callback function for the Curve Edit Window.
+            <ul>
+                <li>Original mouse callback is called.</li>
+                <li>When mouse button is released, update the shape.</li>
+            </ul>
+
+            <h4><code>mouseClick3D()</code>, <code>mouseDrag3D()</code>, <code>keyboard3D()</code></h4>
+            Callbacks added for the 3D window.
+            <ul>
+                <li>Handles various view manipulation.</li>
+            </ul>
+
+            <h4><code>void init3D()</code></h4>
+            Initialization function for the 3D Model window.
+            <ul>
+                <li>Shaders are loaded and buffers are created.</li>
+                <li>Uniform locations are loaded to a global variable.</li>
+            </ul>
+
+            <h4><code>void display3D()</code></h4>
+            Display callback for the 3D Model Window.
+            <ul>
+                <li>Pass in shader uniforms for light and material properties.</li>
+                <li>Draw the contents of the only (3D Model) buffer.</li>
+                <li>A translation by -0.5 on the y direction is arppied on the model.</li>
+            </ul>
+
+            <h4><code>void reloadShape()</code></h4>
+            Function for creating the vertices, normals, and triangle indicies given <code>discreteCurvePoints</code>.
+            <ul>
+                <li>Only executes when there exists more than 2 <code>discreteCurvePoints</code>.</li>
+                <li>Some curves--namely, recursive Bezier and B-spline--generate duplicate points. A clean up routine is done to remove any repeated points.</li>
+                <li>Sharp edges are handled.</li>
+                <li>After some processing, the curves are taken around the y-axis (<code>RESOLUTION</code> many times) to create the final solid.</li>
+                <li>All the data is written to the openGL buffers.</li>
+            </ul>
+
+            <h4><code>vec3 findNormalAverage(vec4 foward, vec4 back, vec4 left, vec4 right)</code></h4>
+            A helper function for <code>reloadShape()</code>. Finds the approximate normal value at a vertex, given the vectors pointing foward, back, left, and right.
+            
+            <h4><code>void pushVec3</code>, <code>void pushVec4</code></h4>
+            A helper function for <code>reloadShape()</code>. Pushes the first 3 components of vec3 and vec4 into a given vector. 
+            
+            <h4>Other</h4>
+            <ul>
+                <li>
+                    <code>GLuint VAO3D, VBO3D, NBO3D, EBO3D</code>: Buffer position for 3D.
+                </li>
+                <li>
+                    <code>GLuint projectionPos3D, modelviewPos3D, colorPos3D, lightcolPos, ambientcolPos, diffusecolPos, specularcolPos, emissioncolPos, shininesscolPos</code>: Shader uniform positions for 3D.
+                </li>
+                <li>
+                    <code>GLuint window, window3D</code>: Reference to the windows. Required because we have to use multiple windows and setting the correct context.
+                </li>
+                <li>
+                    <code>Pvector discreteCurvePoints</code>: A Point vector passed into all <code>Curve::draw()</code> to save all the discrete curve values.
+                </li>
+                <li>
+                    <code>int numIndiciesToDraw</code>: Number of elements to be passed into <code>GL_ELEMENT_ARRAY_BUFFER</code>. This needs to be saved to be communicated from <code>reloadShape()</code> to <code>display3D()</code>.
+                </li>
+                <li>
+                    <code>int mouse3D_oldx, mouse3D_oldy</code>: Old mouse position for the 3D window. Required to make dragging actions work.
+                </li>
+                <li>
+                    <code>vec3 eyeDefault, upDefault, eye, up</code>: Information about the camera. <code>eye, up</code> keeps track of the current camera state.
+                </li>
+                <li>
+                    <code>bool REQUIRE_SHARP_EDGE</code>: A state variable that tells <code>reloadShape()</code> to whether treat all edges as sharp or not.
+                </li>
+                <li>
+                    User defined variables are discussed in the <b>Instructions + Controls</b> section in Main page.
+                </li>
+                <li>
+                    <code>const float LOOK_SENSITIVITY, ZOOM_SENSITIVITY</code>: Sensitivity multiplier for rotating and zooming.
+                </li>
+            </ul>
+
+
+
+        </details>
+
+        <!--Curves-->
+        <details>
+            <summary>Curve related files</summary>
+            Refers to the following files: Curve.h, Curve.cpp, Bezier.h, Bspline.h, Bezier2.h, curve2.cpp.
+
+            <h4>Modifications</h4>
+
+            <p>
+                Header files are modified. Specifically, the <code>Curve::draw()</code> functions now also take in <code>Pvector & discreteCurvePoints</code>.
+            </p>
+
+            <p>
+                Furthermore, the curve files (Curve.cpp and curve2.cpp) are modified to update <code>discreteCurvePoints</code> when <code>draw()</code> is called. Following functions are modified:
+                <ul>
+                    <li><code>Curve::draw() @ Curve.cpp</code></li>
+                    <li><code>Bezier::draw() @ curve2.cpp</code></li>
+                    <li><code>Bspline::draw() @ curve2.cpp</code></li>
+                    <li><code>Bezier2::draw() @ curve2.cpp</code></li>
+                </ul>
+            </p>
+        </details>
+
+        <!--Shaders-->
+        <details>
+            <summary>Shaders</summary>
+            reg.frag.glsl and reg.vert.glsl are added for the 3D Model Window. These are taken from hw2. The fragment shader is modified to just have one point light at the eye.
+        </details>
+
+
+
+    </span>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!--For SPA-->
+    <script>
+        const mainPage = document.getElementById("main-page");
+        const docPage = document.getElementById("documentation-page");
+        const changesPage = document.getElementById("changes-page");
+        function reset() {
+            mainPage.style.display = 'none';
+            docPage.style.display = 'none';
+            changesPage.style.display = 'none';
+        }
+
+        function switchMain() { reset(); mainPage.style.display = 'block'; }
+        function switchDoc() { reset(); docPage.style.display = 'block'; }
+        function switchChanges() { reset(); changesPage.style.display = 'block'; }
+    </script>
+</body>
+
+</html>

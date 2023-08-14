@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HW4</title>
+</head>
+
+<script>
+    // SPA utilities
+    let mainPage;
+    let AccelPage;
+    let ECPage;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        mainPage = document.getElementById("page-main");
+        accelPage = document.getElementById("page-accel");
+        ECPage = document.getElementById("page-ec");
+        
+        // only show the overview page.
+        disableAll();
+        showMain();
+    })
+    
+    function disableAll() {
+        mainPage.style.display = "none";
+        accelPage.style.display = "none";
+        ECPage.style.display = "none";
+    }
+
+    function showMain() {
+        mainPage.style.display = "block";
+    }
+
+    function showAccel() {
+        accelPage.style.display = "block";
+    }
+
+    function showEC() {
+        ECPage.style.display = "block";
+    }
+
+</script>
+
+<style>
+    body {
+        font-family: 'Helvetica', 'Arial', sans-serif;
+    }
+
+    code {
+        border-radius: 3px;
+        background-color: rgb(190, 190, 190);
+        padding: 1px;
+    }
+</style>
+
+<body style="padding-left: 25%; padding-right: 25%; padding-bottom: 20vh;">
+
+<!--HEADER-->
+    <h1 style="border-bottom: 1px solid black; font-size: 300%; ">HW4: RAYTRACER</h1>
+    <h2>UCSD WI23 | CSE 167 (Ramamoorthi)</h2>
+
+    <p><i>This README file has been modified for my resume.</i></p>
+
+<!--NAV BAR-->
+<div id="nav" style="display: flex; justify-content: left; gap: 10px">
+
+    <style>
+        #nav span {
+            color: rgb(0, 0, 0);
+            background-color: rgb(205, 205, 205);
+            border-radius: 2px;
+            padding: 10px;
+            transition: 0.5s;
+        }
+
+        #nav span:hover {
+            background-color: gray;
+        }
+    </style>
+    
+    
+
+    <span onclick="{disableAll(); showMain()}">Overview</span>
+    <span onclick="{disableAll(); showAccel()}">Acceleration</span>
+    <span onclick="{disableAll(); showEC()}">Extra Credit</span>
+
+   
+
+
+</div>
+
+<!--MAIN/INTRODUCTION-->
+<div id="page-main" style="display: block;">
+
+    <h2>What the project was about</h2>
+    <p>
+        Students were asked to form a group of 1 or 2.
+        I was part of a group of 2.
+    </p>
+    <p>
+        Groups were asked to create a raytracer.
+        The program had to parse a text file that specifies details about the scene to render.
+        It contains information such as camera properties, transformation stack, and objects (primitives).
+        The output is an image file.
+    </p>
+    <p>
+        We also had opportunities to do extra, such as implementation of acceleration structures, softshadows, refractions, and texture mapping.
+        Our group only had plans to do a few things, which were softshadows and other file (STL) support.
+        We tried messing around implementing refractions but we noticed our code was not ready for such changes.
+    </p>
+    <p>
+        Rest of the sections will remain unmodified from the original documentation of the project.
+        The <b>overview</b> section will go over what we have done. It also contains some images that we've produced. 
+        The <b>acceleration</b> section will discuss the acceleration structure. It documents the implementation and speedup.
+        The <b>extra credit</b> section will talk about the implementation of our extra credit features in more detail.
+    </p>
+
+    <h2>Overview</h2>
+    <p>
+        We have implemented all basic feaures required for a raytracer. Parses the given file correctly, produces the image of the scene with parallelization and acceleration structure. Some extra features have been added for the <b>Extra Credit</b>.
+    </p>
+
+    <h3 style="border-bottom: solid 1px black;">Instructions</h3>
+    <p>
+        Open <code>hw4/hw4.sln</code>. Change to Release mode. Click run. Make sure you have input arguments set in the Debug option.</li>
+    </p>
+    <p>
+        Alternatively, you can run <code>Release/hw4.exe</code> with desired input file or the shell script <code>Release/runtests.sh</code> which will render all scenes located in <code>Release/testscenes/*.test</code>. The shell script ignores all output of the program and will tell you how long the execution time was.
+    </p>
+    <p>
+        The parameters for area light, specifically sample size and perturbation amount, must be set within the code in <code>main.cpp</code>. You will have to rebuild the program.    
+    </p>
+
+    <h3 style="border-bottom: solid 1px black;">Images</h3>
+    <span style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+        <img width="70%" src="documentation/arealight2.png" alt="">
+        <img width="70%" src="documentation/f35.stl.png" alt="">
+        <img width="70%" src="documentation/scene4-specular.png" alt="">
+        <img width="70%" src="documentation/scene7.png" alt="">
+        <img width="70%" src="documentation/teapot.stl.png" alt="">
+        <img width="70%" src="documentation/scene6-arealight.png" alt="">
+        <br>
+        This is our rough implementation of refraction. 
+        We assumed that the sphere was filled, with a higher index of refraction.
+        Inside of the sphere, the program correctly displays an upside down image of the background.
+        <br>
+        <img width="70%" src="documentation/refraction-attempt.png" alt="">
+    </span>
+    
+    
+
+</div>
+
+
+<div id="page-accel" style="display: block;">
+    <h2>Acceleration Structure</h2>
+
+    <h3 style="border-bottom: solid 1px black;">Implementation</h3>
+    <p>
+        We implemented the <b>Octree</b> acceleration structure. 
+        Octree partitions space into 8 rectangular prisms. And each of the children are also partitioned in the same way, depending on how many <code>Primitives</code> are inside.
+        An <code>OctreeNode</code> consists of 8 referenes to a <code>BoundingBox</code> and list of <code>Primitives</code>. 
+        <code>Primitives</code> that are <i>strictly</i> inside of a particular <code>BoundingBox</code> is part of the child's <code>BoundingBox</code>.
+        Those that are not strictly inside of any of the child is now part of the parent's list of <code>Primitives</code>.
+    </p>
+    <p>
+        Intersection between the ray is checked with the root <code>OctreeNode</code> (constructed with all the <code>Primitives</code> of the scene). 
+        We check if the ray hits any of the <code>Primitives</code> that are in the <code>root</code>. 
+        Now, check if the ray hits any of the children's <code>BoudningBox</code> and recurse on those that have been hit.
+    </p>
+
+    <h3 style="border-bottom: solid 1px black;">Improvements</h3>
+    <p>Pared with parallelization, scene7.test went from taking ~20min (~1,200s) to ~7s. About 170 times faster!</p>
+    <img src="documentation/runtime.png" alt="speed of our program.">
+
+</div>
+
+<div id="page-ec" style="display: block;">
+    <h2>Extra Credit</h2>
+    <h3 style="border-bottom: solid 1px black">Area Light</h3>
+
+    <p>
+        We have created an area light source, which can be instantiated with <code>arealight</code> command in the input file. 
+        The area light is given a radius (hence, it's a sphere) and the visibility of the light source is calculated by sampling points around the radius of it's position.
+        Usage:
+    </p>
+    <p style="text-align: center;">
+        <code>arealight x y z r g b r</code>
+    </p>
+    <p>
+        where <code>(x, y, z)</code> is the position of the area light,
+        <code>(r, g, b)</code> is the color of the area light, and
+        <code>r</code> is the radius of the area light.
+    </p>
+
+    <img src="documentation\scene6-arealight.png" alt="scene 6 with area light source." width="100%">
+    <p style="text-align: center"><code>perturb=0.01f, samples=64</code></p>
+    <img src="documentation\arealight2.png" alt="a scene with two balls and a area light source" width="100%">
+    <p style="text-align: center"><code>perturb=0.3f, samples=64</code></p>
+
+    <h4>Implementation Overview</h4>
+    <p>
+        Each light is randomly sampled from the hit position to determine the visibilty of the pixel.
+        A set of points is created using the <b>Sunflower Seed</b> algorithm + some perturbation to randomize the points. 
+        This achieves the effect of stratified sampling, rather than complete random sampling (required many sampled points to achieve smooth shadows).
+        I've included a interactive demonstration of the Sunflower Seed algorithm below.
+        Note that the above points are in XY coordinate frame.
+        Using the lights position and hit position (position in which we are trying to sample the light from), we can construct the necessary transformation to take the sample points to the correct position.
+        Finally, cast rays to each sampled point and see if each sample is visible from the hit position.
+    </p>
+    <p>
+        In the end, we have <code>visibility = numHit / numSample</code>.
+        The visibility value is multiplied to the diffuse and specular component.
+    </p>
+
+    <div style="display: flex; justify-content: center;">
+        <iframe style="border: solid 2px black; width: 400px; height: 442px; box-shadow: 2px 2px 20px rgb(170, 170, 170);" src="https://editor.p5js.org/gukim/full/qM6CNi1aR"></iframe>
+    </div>
+
+    <p>
+        Note that the sampling method does not treat the light source as a sphere, but rather a disk in space, oriented based on where we are sampling.
+        This method is obviously <b>not</b> accurate, but I really wanted to implement the Sunflower Seed algorithm.
+    </p>
+
+   
+
+
+    <h3 style="border-bottom: solid 1px black">STL File Support</h3>
+    <p>
+        STL (Standard Triangle Language) files can be parsed. <a href="https://github.com/Akhil841/stlparser">Link</a> to the parser written by my partner.
+    </p>
+    <p>
+        We created a new triangle type, <code>stltri</code>, which has the form:
+    </p>
+    <p style="text-align: center;">
+        <code>stltri nx ny nz v1 v2 v3</code>
+    </p>
+    <p>
+        where <code>(nx, ny, nz)</code> are the normals,
+        and <code>(v1, v2, v3)</code> are the vertices.
+        Notably, <code>stltri</code> does not have an orientation and its <b>face normal</b> is defined by the input.
+    </p>
+
+    <h4>Showcase</h4>
+    <p>
+        Here are some of the things that our parser and custom triangle type can render.
+    </p>
+    <img width="100%" src="documentation\f35.stl.png" alt="f35 rendered by our raytracer">
+    <img width="100%" src="documentation\teapot.stl.png" alt="utah teapot rendered by our raytracer">
+</div>
+
+
+</body>
+</html>

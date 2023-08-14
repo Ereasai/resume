@@ -1,0 +1,60 @@
+h1 {
+    font-size: 5rem;
+}
+
+body {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    background-color: white;
+    padding-left: 25%;
+    padding-right: 25%;
+    padding-bottom: 20px;
+}
+
+@media (max-width: 700px) {
+    body {
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+}
+
+
+
+
+.project-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-content: center;
+    gap: 5px;
+}
+
+@media (max-width: 1200px) {
+    .project-container {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 800px) {
+    .project-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.project-card {
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+
+    padding: 10px;
+
+    border-style: solid;
+    border-radius: 10px;
+    border-width: 2px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+
+.project-card > p {
+    text-align: center;
+}
